@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Detection Logs{% endblock %}
+{% block page_title %}Detection Logs{% endblock %}
+
+{% block content %}
+<div class="logs-page">
+
+    <!-- Toolbar -->
+    <div class="logs-toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="logSearch" placeholder="Search logs…" />
+            </div>
+            <select class="filter-select" id="typeFilter">
+                <option value="">All Types</option>
+                <option value="DROWSY">Drowsy</option>
+                <option value="YAWN">Yawn</option>
+                <option value="DISTRACTED">Distracted</option>
+                <option value="PHONE">Phone</option>
+                <option value="HEAD_TURN">Head Turn</option>
+            </select>
+            <select class="filter-select" id="severityFilter">
+                <option value="">All Severities</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+            </select>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-outline" id="btnRefresh">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+            <button class="btn btn-outline" id="btnExport">
+                <i class="fa-solid fa-file-export"></i> Export CSV
+            </button>
+            <button class="btn btn-danger-outline" id="btnClear"
+                    onclick="clearLogs()">
+                <i class="fa-solid fa-trash"></i> Clear Logs
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Chips -->
+    <div class="log-summary-chips" id="logSummary">
+        <span class="chip chip-total">Total: <strong id="chipTotal">{{ logs|length }}</strong></span>
+        <span class="chip chip-drowsy">Drowsy: <strong id="chipDrowsy">0</strong></span>
+        <span class="chip chip-yawn">Yawn: <strong id="chipYawn">0</strong></span>
+        <span class="chip chip-distracted">Distracted: <strong id="chipDistracted">0</strong></span>
+        <span class="chip chip-phone">Phone: <strong id="chipPhone">0</strong></span>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="table-container">
+        <table class="logs-table" id="logsTable">
+            <thead>
+                <tr>
+                    <th class="sortable" data-col="id">ID <i class="fa-solid fa-sort"></i></th>
+                    <th class="sortable" data-col="timestamp">Timestamp <i class="fa-solid fa-sort"></i></th>
+                    <th class="sortable" data-col="detection_type">Type <i class="fa-solid fa-sort"></i></th>
+                    <th>EAR</th>
+                    <th>MAR</th>
+                    <th>Pitch</th>
+                    <th>Yaw</th>
+                    <th class="sortable" data-col="severity">Severity <i class="fa-solid fa-sort"></i></th>
+                    <th>Screenshot</th>
+                </tr>
+            </thead>
+            <tbody id="logsBody">
+                {% if logs %}
+                    {% for log in logs %}
+                    <tr class="log-row" data-type="{{ log.detection_type }}"
+                        data-severity="{{ log.severity }}">
+                        <td class="id-cell">{{ log.id }}</td>
+                        <td class="ts-cell">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') if log.timestamp else '—' }}</td>
+                        <td>
+                            <span class="type-badge type-{{ log.detection_type | lower }}">
+                                {{ log.detection_type }}
+                            </span>
+                        </td>
+                        <td class="metric-cell">
+                            <span class="metric-pill {% if log.ear < 0.25 %}danger{% endif %}">
+                                {{ "%.3f"|format(log.ear) }}
+                            </span>
+                        </td>
+                        <td class="metric-cell">
+                            <span class="metric-pill {% if log.mar > 0.6 %}warn{% endif %}">
+                                {{ "%.3f"|format(log.mar) }}
+                            </span>
+                        </td>
+                        <td class="metric-cell">{{ "%.1f"|format(log.head_pitch) }}°</td>
+                        <td class="metric-cell">{{ "%.1f"|format(log.head_yaw) }}°</td>
+                        <td>
+                            <span class="sev-badge sev-{{ log.severity | lower }}">
+                                {{ log.severity }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if log.screenshot_path %}
+                            <button class="btn-icon" onclick="viewScreenshot('{{ log.screenshot_path }}')"
+                                    title="View screenshot">
+                                <i class="fa-solid fa-image"></i>
+                            </button>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="9" class="empty-table">
+                        <i class="fa-solid fa-inbox empty-icon"></i>
+                        <p>No detection logs found. Start monitoring to generate logs.</p>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination">
+        <button class="btn btn-outline btn-sm" id="btnPrevPage" disabled>
+            <i class="fa-solid fa-chevron-left"></i> Previous
+        </button>
+        <span class="page-info" id="pageInfo">Page 1</span>
+        <button class="btn btn-outline btn-sm" id="btnNextPage">
+            Next <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Screenshot Modal -->
+<div class="modal-overlay hidden" id="screenshotModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-image"></i> Detection Screenshot</h3>
+            <button class="modal-close" onclick="closeScreenshot()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <img src="" id="screenshotImg" alt="Detection screenshot"
+             class="screenshot-preview" />
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/logs.js') }}"></script>
+<script>
+// Count by type for summary chips
+(function () {
+    const rows = document.querySelectorAll('.log-row');
+    const counts = { DROWSY: 0, YAWN: 0, DISTRACTED: 0, PHONE: 0 };
+    rows.forEach(r => {
+        const t = r.dataset.type;
+        if (counts[t] !== undefined) counts[t]++;
+    });
+    document.getElementById('chipDrowsy').textContent    = counts.DROWSY;
+    document.getElementById('chipYawn').textContent      = counts.YAWN;
+    document.getElementById('chipDistracted').textContent = counts.DISTRACTED;
+    document.getElementById('chipPhone').textContent     = counts.PHONE;
+})();
+</script>
+{% endblock %}

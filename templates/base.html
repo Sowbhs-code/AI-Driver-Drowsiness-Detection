@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}DrowsyGuard{% endblock %} | AI Driver Monitoring</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="dark-theme">
+
+    <!-- ── Sidebar Navigation ────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-car-side brand-icon"></i>
+            <span class="brand-text">DrowsyGuard</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('index') }}"
+               class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                <i class="fa-solid fa-house nav-icon"></i>
+                <span>Home</span>
+            </a>
+            <a href="{{ url_for('dashboard') }}"
+               class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-gauge-high nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('logs') }}"
+               class="nav-item {% if request.endpoint == 'logs' %}active{% endif %}">
+                <i class="fa-solid fa-list-check nav-icon"></i>
+                <span>Detection Logs</span>
+            </a>
+            <a href="{{ url_for('reports') }}"
+               class="nav-item {% if request.endpoint == 'reports' %}active{% endif %}">
+                <i class="fa-solid fa-chart-pie nav-icon"></i>
+                <span>Reports</span>
+            </a>
+            <a href="{{ url_for('settings') }}"
+               class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}">
+                <i class="fa-solid fa-gear nav-icon"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="version-tag">v1.0.0 · MCA Project 2024</span>
+        </div>
+    </aside>
+
+    <!-- ── Main Content ──────────────────────────────────────────────────── -->
+    <main class="main-content" id="main-content">
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+            <div class="topbar-right">
+                <div class="status-dot" id="connectionDot" title="Server connection"></div>
+                <span class="status-label" id="connectionLabel">Connecting…</span>
+                <span class="topbar-time" id="topbarClock"></span>
+                {% if current_user.is_authenticated %}
+                <div class="user-info">
+                    <i class="fa-solid fa-circle-user user-avatar"></i>
+                    <span class="user-name">{{ current_user.full_name or current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}" class="btn-logout" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- ── Global Alert Toast ─────────────────────────────────────────────── -->
+    <div class="alert-toast" id="alertToast">
+        <i class="fa-solid fa-triangle-exclamation toast-icon"></i>
+        <span id="toastMessage">Alert!</span>
+    </div>
+
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

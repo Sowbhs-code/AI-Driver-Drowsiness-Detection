@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Live Dashboard{% endblock %}
+{% block page_title %}Live Monitoring Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+
+    <!-- ── Left: Video Feed ──────────────────────────────────────────────── -->
+    <div class="video-panel">
+        <div class="panel-header">
+            <h2><i class="fa-solid fa-video"></i> Live Camera Feed</h2>
+            <div class="panel-controls">
+                <button class="btn btn-success" id="btnStart">
+                    <i class="fa-solid fa-play"></i> Start
+                </button>
+                <button class="btn btn-danger" id="btnStop" disabled>
+                    <i class="fa-solid fa-stop"></i> Stop
+                </button>
+                <button class="btn btn-outline" id="btnSnapshot">
+                    <i class="fa-solid fa-camera"></i> Snapshot
+                </button>
+            </div>
+        </div>
+
+        <div class="video-container" id="videoContainer">
+            <div class="video-placeholder" id="videoPlaceholder">
+                <i class="fa-solid fa-video-slash placeholder-icon"></i>
+                <p>Click <strong>Start</strong> to begin monitoring</p>
+            </div>
+            <img src="" id="videoFeed" class="video-feed hidden"
+                 alt="Live camera feed" />
+
+            <!-- Status overlay -->
+            <div class="video-overlay" id="videoOverlay">
+                <span class="overlay-status" id="overlayStatus">NORMAL</span>
+            </div>
+        </div>
+
+        <!-- Metric Bars -->
+        <div class="metric-bars">
+            <div class="metric-bar-item">
+                <span class="metric-bar-label">EAR (Eye Openness)</span>
+                <div class="progress-track">
+                    <div class="progress-fill ear-fill" id="earBar" style="width:70%"></div>
+                </div>
+                <span class="metric-bar-value" id="earVal">0.300</span>
+            </div>
+            <div class="metric-bar-item">
+                <span class="metric-bar-label">MAR (Mouth Opening)</span>
+                <div class="progress-track">
+                    <div class="progress-fill mar-fill" id="marBar" style="width:20%"></div>
+                </div>
+                <span class="metric-bar-value" id="marVal">0.200</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Right: Status Panel ────────────────────────────────────────────── -->
+    <div class="status-panel">
+
+        <!-- Driver Status Card -->
+        <div class="status-card" id="statusCard">
+            <div class="status-header">
+                <i class="fa-solid fa-circle-check status-icon" id="statusIcon"></i>
+                <div>
+                    <div class="status-main" id="statusMain">NORMAL</div>
+                    <div class="status-sub" id="statusSub">Driver is alert</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detection Indicators -->
+        <div class="indicators-grid">
+            <div class="indicator-card" id="indEye">
+                <i class="fa-solid fa-eye ind-icon"></i>
+                <span class="ind-label">Eyes</span>
+                <span class="ind-value" id="indEyeVal">Open</span>
+            </div>
+            <div class="indicator-card" id="indYawn">
+                <i class="fa-solid fa-face-tired ind-icon"></i>
+                <span class="ind-label">Yawn</span>
+                <span class="ind-value" id="indYawnVal">No Yawn</span>
+            </div>
+            <div class="indicator-card" id="indHead">
+                <i class="fa-solid fa-rotate ind-icon"></i>
+                <span class="ind-label">Head</span>
+                <span class="ind-value" id="indHeadVal">Forward</span>
+            </div>
+            <div class="indicator-card" id="indPhone">
+                <i class="fa-solid fa-mobile-screen ind-icon"></i>
+                <span class="ind-label">Phone</span>
+                <span class="ind-value" id="indPhoneVal">None</span>
+            </div>
+            <div class="indicator-card" id="indGlasses">
+                <i class="fa-solid fa-glasses ind-icon"></i>
+                <span class="ind-label">Glasses</span>
+                <span class="ind-value" id="indGlassesVal">None</span>
+            </div>
+        </div>
+
+        <!-- Head Pose Readout -->
+        <div class="metrics-card">
+            <h3 class="card-title"><i class="fa-solid fa-compass"></i> Head Pose</h3>
+            <div class="pose-readout">
+                <div class="pose-item">
+                    <span class="pose-label">Pitch</span>
+                    <span class="pose-value" id="posePitch">0.0°</span>
+                    <div class="pose-bar-track">
+                        <div class="pose-bar" id="posePitchBar"></div>
+                    </div>
+                </div>
+                <div class="pose-item">
+                    <span class="pose-label">Yaw</span>
+                    <span class="pose-value" id="poseYaw">0.0°</span>
+                    <div class="pose-bar-track">
+                        <div class="pose-bar" id="poseYawBar"></div>
+                    </div>
+                </div>
+                <div class="pose-item">
+                    <span class="pose-label">Roll</span>
+                    <span class="pose-value" id="poseRoll">0.0°</span>
+                    <div class="pose-bar-track">
+                        <div class="pose-bar" id="poseRollBar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Stats -->
+        <div class="metrics-card">
+            <h3 class="card-title"><i class="fa-solid fa-stopwatch"></i> Session Stats</h3>
+            <div class="session-stats">
+                <div class="ss-item">
+                    <span class="ss-label">Duration</span>
+                    <span class="ss-value" id="ssDuration">00:00:00</span>
+                </div>
+                <div class="ss-item">
+                    <span class="ss-label">Alerts</span>
+                    <span class="ss-value alert-count" id="ssAlerts">0</span>
+                </div>
+                <div class="ss-item">
+                    <span class="ss-label">FPS</span>
+                    <span class="ss-value" id="ssFps">0</span>
+                </div>
+                <div class="ss-item">
+                    <span class="ss-label">Face</span>
+                    <span class="ss-value" id="ssFace">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- EAR History Mini Chart -->
+        <div class="metrics-card chart-card">
+            <h3 class="card-title"><i class="fa-solid fa-chart-line"></i> EAR History</h3>
+            <canvas id="earChart" height="90"></canvas>
+        </div>
+
+    </div>
+</div>
+
+<!-- Alert Modal -->
+<div class="alert-modal" id="alertModal">
+    <div class="alert-modal-content">
+        <div class="alert-modal-icon" id="alertModalIcon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 id="alertModalTitle">DROWSINESS DETECTED!</h2>
+        <p id="alertModalMsg">Driver appears to be drowsy. Please pull over safely.</p>
+        <button class="btn btn-primary" onclick="dismissAlert()">
+            <i class="fa-solid fa-check"></i> Acknowledge
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

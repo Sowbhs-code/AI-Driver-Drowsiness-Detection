@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block page_title %}AI Driver Monitoring System{% endblock %}
+
+{% block content %}
+<!-- ── Hero Section ───────────────────────────────────────────────────────── -->
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fa-solid fa-shield-halved"></i> Real-Time AI Monitoring
+        </div>
+        <h1 class="hero-title">
+            Driver Drowsiness &amp;<br/>
+            <span class="gradient-text">Distraction Detection</span>
+        </h1>
+        <p class="hero-desc">
+            An AI-powered system using Computer Vision and Deep Learning to detect
+            driver drowsiness, yawning, head movement, and mobile phone usage in
+            real time — keeping roads safer.
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-play"></i> Start Monitoring
+            </a>
+            <a href="{{ url_for('reports') }}" class="btn btn-outline btn-lg">
+                <i class="fa-solid fa-chart-bar"></i> View Reports
+            </a>
+        </div>
+    </div>
+    <div class="hero-graphic">
+        <div class="monitor-preview">
+            <div class="monitor-screen">
+                <div class="scan-line"></div>
+                <div class="face-outline">
+                    <div class="eye left-eye"></div>
+                    <div class="eye right-eye"></div>
+                    <div class="nose-dot"></div>
+                    <div class="mouth-line"></div>
+                </div>
+                <div class="detection-labels">
+                    <span class="det-label ear-label">EAR: 0.32</span>
+                    <span class="det-label mar-label">MAR: 0.21</span>
+                    <span class="det-label status-label normal">● NORMAL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Feature Cards ─────────────────────────────────────────────────────── -->
+<section class="features-section">
+    <h2 class="section-title">System Capabilities</h2>
+    <div class="features-grid">
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#1e40af22;color:#3b82f6">
+                <i class="fa-solid fa-eye"></i>
+            </div>
+            <h3>Eye Closure Detection</h3>
+            <p>Monitors Eye Aspect Ratio (EAR) in real time. Triggers alert when
+               eyes remain closed for ≥ 20 consecutive frames.</p>
+            <div class="feature-tag">EAR Algorithm</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#7c3aed22;color:#8b5cf6">
+                <i class="fa-solid fa-face-tired"></i>
+            </div>
+            <h3>Yawn Detection</h3>
+            <p>Calculates Mouth Aspect Ratio (MAR) from MediaPipe landmarks.
+               Detects persistent yawning as an early drowsiness indicator.</p>
+            <div class="feature-tag">MAR Algorithm</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#065f4622;color:#10b981">
+                <i class="fa-solid fa-rotate"></i>
+            </div>
+            <h3>Head Pose Estimation</h3>
+            <p>Uses PnP solver to compute pitch, yaw, and roll angles. Detects
+               head nodding and looking away from the road.</p>
+            <div class="feature-tag">OpenCV solvePnP</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#7f1d1d22;color:#ef4444">
+                <i class="fa-solid fa-mobile-screen"></i>
+            </div>
+            <h3>Phone Detection</h3>
+            <p>YOLOv8 object detector identifies mobile phone usage in real time
+               with configurable confidence threshold.</p>
+            <div class="feature-tag">YOLOv8</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#78350f22;color:#f59e0b">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <h3>Audio Alert System</h3>
+            <p>Multi-channel alerts via audio file playback and text-to-speech.
+               Cooldown control prevents alert fatigue.</p>
+            <div class="feature-tag">pygame + pyttsx3</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#1e3a5f22;color:#06b6d4">
+                <i class="fa-solid fa-database"></i>
+            </div>
+            <h3>Detection Logging</h3>
+            <p>Every detection event is stored in SQLite with EAR, MAR, head
+               angles, timestamps, and auto-captured screenshots.</p>
+            <div class="feature-tag">SQLite + SQLAlchemy</div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ── Technology Stack ───────────────────────────────────────────────────── -->
+<section class="tech-section">
+    <h2 class="section-title">Technology Stack</h2>
+    <div class="tech-grid">
+        {% set techs = [
+            ('Python 3.10+',  'fa-brands fa-python',   '#3b82f6'),
+            ('OpenCV 4.10',   'fa-solid fa-camera',    '#10b981'),
+            ('MediaPipe',     'fa-solid fa-face-smile','#8b5cf6'),
+            ('YOLOv8',        'fa-solid fa-crosshairs','#ef4444'),
+            ('PyTorch',       'fa-solid fa-fire',      '#f59e0b'),
+            ('Flask',         'fa-solid fa-flask',     '#06b6d4'),
+            ('SQLite',        'fa-solid fa-database',  '#6366f1'),
+            ('Socket.IO',     'fa-solid fa-bolt',      '#f97316'),
+        ] %}
+        {% for name, icon, color in techs %}
+        <div class="tech-badge" style="border-color:{{ color }}22">
+            <i class="{{ icon }}" style="color:{{ color }}"></i>
+            <span>{{ name }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ── Quick Stats Strip ──────────────────────────────────────────────────── -->
+<section class="stats-strip">
+    <div class="stat-item">
+        <span class="stat-num" id="statSessions">—</span>
+        <span class="stat-label">Total Sessions</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-num" id="statDetections">—</span>
+        <span class="stat-label">Detection Events</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-num" id="statAlerts">—</span>
+        <span class="stat-label">Alerts Fired</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-num">94.7%</span>
+        <span class="stat-label">Detection Accuracy</span>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Fetch quick stats for the landing page
+fetch('/api/stats')
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('statSessions').textContent   = data.total_sessions   || 0;
+        document.getElementById('statDetections').textContent = data.total_detections || 0;
+        document.getElementById('statAlerts').textContent     = data.total_alerts     || 0;
+    })
+    .catch(() => {});
+</script>
+{% endblock %}

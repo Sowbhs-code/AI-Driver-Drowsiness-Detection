@@ -1,0 +1,233 @@
+
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block page_title %}Reports &amp; Analytics{% endblock %}
+
+{% block content %}
+<div class="reports-page">
+
+    <!-- KPI Cards Row -->
+    <div class="kpi-row">
+
+        <div class="kpi-card">
+            <div class="kpi-icon" style="color:#3b82f6">
+                <i class="fa-solid fa-video"></i>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-value">{{ stats.total_sessions }}</div>
+                <div class="kpi-label">Total Sessions</div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon" style="color:#f59e0b">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-value">{{ stats.total_detections }}</div>
+                <div class="kpi-label">Detection Events</div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon" style="color:#ef4444">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-value">{{ stats.total_alerts }}</div>
+                <div class="kpi-label">Alerts Triggered</div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon" style="color:#10b981">
+                <i class="fa-solid fa-percent"></i>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-value">Evaluated</div>
+                <div class="kpi-label">Model Evaluation Status</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="charts-row">
+
+        <div class="chart-card">
+            <h3 class="card-title">
+                <i class="fa-solid fa-chart-pie"></i>
+                Detection by Type
+            </h3>
+            <canvas id="typeChart" height="220"></canvas>
+        </div>
+
+        <div class="chart-card chart-wide">
+            <h3 class="card-title">
+                <i class="fa-solid fa-calendar-days"></i>
+                Events – Last 7 Days
+            </h3>
+            <canvas id="dailyChart" height="180"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="charts-row">
+
+        <div class="chart-card chart-wide">
+            <h3 class="card-title">
+                <i class="fa-solid fa-clock"></i>
+                Hourly Distribution
+            </h3>
+            <canvas id="hourlyChart" height="180"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <h3 class="card-title">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Severity Breakdown
+            </h3>
+            <canvas id="severityChart" height="220"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Evaluation Metrics -->
+    <div class="eval-section">
+        <h2 class="section-title">Model Evaluation Metrics</h2>
+
+        <div class="eval-grid">
+
+            <div class="eval-card">
+                <div class="eval-header">Eye Detection (CNN V2)</div>
+                <div class="eval-metrics">
+                    <div class="eval-row">
+                        <span>MRL Reconstructed Test Accuracy</span>
+                        <span class="eval-val high">86.92%</span>
+                    </div>
+                    <div class="eval-row">
+                        <span>Webcam Holdout Accuracy</span>
+                        <span class="eval-val high">82.23%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="eval-card">
+                <div class="eval-header">Yawn Detection (CNN V2)</div>
+                <div class="eval-metrics">
+                    <div class="eval-row">
+                        <span>Validation Accuracy</span>
+                        <span class="eval-val high">86.16%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="eval-card">
+                <div class="eval-header">Sunglasses Detection (CNN)</div>
+                <div class="eval-metrics">
+                    <div class="eval-row">
+                        <span>Validation Accuracy</span>
+                        <span class="eval-val high">95.80%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="eval-card">
+                <div class="eval-header">Phone Detection (YOLOv8)</div>
+                <div class="eval-metrics">
+                    <div class="eval-row">
+                        <span>Single-image Detection Confidence</span>
+                        <span class="eval-val high">61%</span>
+                    </div>
+                    <div class="eval-row">
+                        <span>Evaluation Samples</span>
+                        <span class="eval-val">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="eval-card">
+                <div class="eval-header">Head Pose Estimation</div>
+                <div class="eval-metrics">
+                    <div class="eval-row">
+                        <span>Evaluation Status</span>
+                        <span class="eval-val">Not measured</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Confusion Matrix -->
+    <div class="confusion-section">
+        <h2 class="section-title">Confusion Matrix – Overall System</h2>
+        <div class="confusion-wrap">
+            <p class="empty-table">
+                A confusion matrix has not yet been generated
+                from an independently labelled test dataset.
+            </p>
+        </div>
+    </div>
+
+    <!-- Recent Sessions -->
+    <div class="sessions-section">
+        <h2 class="section-title">Recent Sessions</h2>
+
+        <div class="table-container">
+            <table class="logs-table">
+
+                <thead>
+                    <tr>
+                        <th>Session ID</th>
+                        <th>Start Time</th>
+                        <th>Duration</th>
+                        <th>Alerts</th>
+                        <th>Drowsy Events</th>
+                        <th>Distracted Events</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% if stats.recent_sessions %}
+                        {% for s in stats.recent_sessions %}
+                        <tr>
+                            <td>#{{ s.id }}</td>
+                            <td>{{ s.start_time or '—' }}</td>
+                            <td>{{ "%.0f"|format(s.duration_secs or 0) }}s</td>
+                            <td>
+                                <span class="chip-sm chip-alert">
+                                    {{ s.alert_count }}
+                                </span>
+                            </td>
+                            <td>{{ s.drowsy_frames }}</td>
+                            <td>{{ s.distracted_frames }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            
+                            <td colspan="6" class="empty-table">
+                                No sessions yet.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    window.statsData = {{ stats | tojson | safe }};
+</script>
+
+<script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+{% endblock %}

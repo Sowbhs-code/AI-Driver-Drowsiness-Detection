@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | DrowsyGuard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <style>
+        .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-primary); }
+        .auth-card  { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow); }
+        .auth-logo  { text-align: center; margin-bottom: 28px; }
+        .auth-logo i { font-size: 2.5rem; color: var(--blue); }
+        .auth-logo h1 { font-size: 1.5rem; font-weight: 700; margin-top: 8px; }
+        .auth-logo p  { font-size: .82rem; color: var(--text-secondary); margin-top: 4px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: .85rem; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
+        .form-control { width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--rs); color: var(--text-primary); font-size: .9rem; outline: none; transition: border-color var(--t); }
+        .form-control:focus { border-color: var(--blue); }
+        .input-icon { position: relative; }
+        .input-icon i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: .9rem; }
+        .input-icon .form-control { padding-left: 36px; }
+        .auth-error { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.4); color: var(--red); padding: 10px 14px; border-radius: var(--rs); font-size: .85rem; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+        .btn-auth { width: 100%; padding: 11px; font-size: .95rem; font-weight: 600; margin-top: 4px; }
+        .auth-footer { text-align: center; margin-top: 22px; font-size: .85rem; color: var(--text-secondary); }
+        .auth-footer a { color: var(--blue); font-weight: 500; }
+        .remember-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <i class="fa-solid fa-car-side"></i>
+            <h1>DrowsyGuard</h1>
+            <p>AI Driver Monitoring System</p>
+        </div>
+
+        {% if error %}
+        <div class="auth-error">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="username" name="username" class="form-control"
+                           placeholder="Enter your username" required autofocus />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="Enter your password" required />
+                </div>
+            </div>
+
+            <div class="remember-row">
+                <input type="checkbox" id="remember" name="remember" />
+                <label for="remember">Remember me</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

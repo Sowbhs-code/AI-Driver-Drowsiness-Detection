@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+
+    <!-- Detection Thresholds -->
+    <div class="settings-section">
+        <h2 class="settings-group-title">
+            <i class="fa-solid fa-sliders"></i> Detection Thresholds
+        </h2>
+        <div class="settings-card">
+            <form id="thresholdForm">
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label class="setting-label">Eye Aspect Ratio (EAR) Threshold</label>
+                        <p class="setting-desc">Below this value, eyes are classified as closed.
+                           Recommended: 0.20 – 0.28</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" min="0.10" max="0.40" step="0.01"
+                               id="earThreshold" name="EAR_THRESHOLD"
+                               value="{{ config.EAR_THRESHOLD }}"
+                               oninput="updateSliderVal('earThreshVal', this.value)" />
+                        <span class="slider-val" id="earThreshVal">{{ config.EAR_THRESHOLD }}</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label class="setting-label">Mouth Aspect Ratio (MAR) Threshold</label>
+                        <p class="setting-desc">Above this value, mouth is classified as open (yawning).
+                           Recommended: 0.50 – 0.70</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" min="0.30" max="0.90" step="0.01"
+                               id="marThreshold" name="MAR_THRESHOLD"
+                               value="{{ config.MAR_THRESHOLD }}"
+                               oninput="updateSliderVal('marThreshVal', this.value)" />
+                        <span class="slider-val" id="marThreshVal">{{ config.MAR_THRESHOLD }}</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label class="setting-label">EAR Consecutive Frames</label>
+                        <p class="setting-desc">Number of consecutive frames with closed eyes before alert.
+                           Higher = less sensitive.</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" min="5" max="60" step="1"
+                               id="earFrames" name="EAR_CONSEC_FRAMES"
+                               value="{{ config.EAR_CONSEC_FRAMES }}"
+                               oninput="updateSliderVal('earFramesVal', this.value)" />
+                        <span class="slider-val" id="earFramesVal">{{ config.EAR_CONSEC_FRAMES }}</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label class="setting-label">Head Pitch Threshold (°)</label>
+                        <p class="setting-desc">Degrees of vertical head tilt before distraction alert.</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" min="5" max="45" step="1"
+                               id="headPitch" name="HEAD_PITCH_THRESHOLD"
+                               value="{{ config.HEAD_PITCH_THRESHOLD }}"
+                               oninput="updateSliderVal('headPitchVal', this.value)" />
+                        <span class="slider-val" id="headPitchVal">{{ config.HEAD_PITCH_THRESHOLD }}</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label class="setting-label">Head Yaw Threshold (°)</label>
+                        <p class="setting-desc">Degrees of horizontal head turn before distraction alert.</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" min="10" max="60" step="1"
+                               id="headYaw" name="HEAD_YAW_THRESHOLD"
+                               value="{{ config.HEAD_YAW_THRESHOLD }}"
+                               oninput="updateSliderVal('headYawVal', this.value)" />
+                        <span class="slider-val" id="headYawVal">{{ config.HEAD_YAW_THRESHOLD }}</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label class="setting-label">Phone Detection Confidence</label>
+                        <p class="setting-desc">Minimum YOLOv8 confidence score to report phone detection.</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" min="0.20" max="0.95" step="0.05"
+                               id="phoneConf" name="PHONE_CONF_THRESHOLD"
+                               value="{{ config.PHONE_CONF_THRESHOLD }}"
+                               oninput="updateSliderVal('phoneConfVal', this.value)" />
+                        <span class="slider-val" id="phoneConfVal">{{ config.PHONE_CONF_THRESHOLD }}</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label class="setting-label">Sunglasses Sensitivity</label>
+                        <p class="setting-desc">Eye-region vs forehead darkness ratio. Lower = only flags very dark/mirrored lenses; higher = also flags lightly tinted glasses.</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" min="0.40" max="0.90" step="0.05"
+                               id="sunglassesRatio" name="SUNGLASSES_DARKNESS_RATIO"
+                               value="{{ config.SUNGLASSES_DARKNESS_RATIO }}"
+                               oninput="updateSliderVal('sunglassesRatioVal', this.value)" />
+                        <span class="slider-val" id="sunglassesRatioVal">{{ config.SUNGLASSES_DARKNESS_RATIO }}</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label class="setting-label">Head-Nod Sleep Threshold (Glasses Mode)</label>
+                        <p class="setting-desc">Consecutive frames of forward head-droop, while sunglasses are detected, before a DROWSY alert fires.</p>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" min="10" max="60" step="1"
+                               id="headNodFrames" name="HEAD_NOD_CONSEC_FRAMES"
+                               value="{{ config.HEAD_NOD_CONSEC_FRAMES }}"
+                               oninput="updateSliderVal('headNodFramesVal', this.value)" />
+                        <span class="slider-val" id="headNodFramesVal">{{ config.HEAD_NOD_CONSEC_FRAMES }}</span>
+                    </div>
+                </div>
+
+                <div class="settings-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Thresholds
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="resetDefaults()">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert Settings -->
+    <div class="settings-section">
+        <h2 class="settings-group-title">
+            <i class="fa-solid fa-bell"></i> Alert Settings
+        </h2>
+        <div class="settings-card">
+            <div class="setting-row">
+                <div class="setting-info">
+                    <label class="setting-label">Audio Alerts</label>
+                    <p class="setting-desc">Enable audio file playback on detection events.</p>
+                </div>
+                <div class="setting-control">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="audioEnabled" checked />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <label class="setting-label">Text-to-Speech Alerts</label>
+                    <p class="setting-desc">Enable spoken voice alerts as fallback when audio files are missing.</p>
+                </div>
+                <div class="setting-control">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="ttsEnabled" checked />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <label class="setting-label">Auto Screenshot</label>
+                    <p class="setting-desc">Automatically capture and save a screenshot when an alert fires.</p>
+                </div>
+                <div class="setting-control">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="screenshotEnabled" checked />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Test Alert Buttons -->
+            <div class="test-alerts">
+                <h4>Test Alerts</h4>
+                <div class="test-btns">
+                    <button class="btn btn-outline btn-sm" onclick="testAlert('DROWSY')">
+                        <i class="fa-solid fa-eye-slash"></i> Test Drowsy
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="testAlert('YAWN')">
+                        <i class="fa-solid fa-face-tired"></i> Test Yawn
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="testAlert('DISTRACTED')">
+                        <i class="fa-solid fa-rotate"></i> Test Distracted
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="testAlert('PHONE')">
+                        <i class="fa-solid fa-mobile-screen"></i> Test Phone
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Info -->
+    <div class="settings-section">
+        <h2 class="settings-group-title">
+            <i class="fa-solid fa-circle-info"></i> System Information
+        </h2>
+        <div class="settings-card sysinfo-grid">
+            <div class="sysinfo-item"><span class="si-label">Application</span><span class="si-val">DrowsyGuard v1.0.0</span></div>
+            <div class="sysinfo-item"><span class="si-label">Framework</span><span class="si-val">Flask 3.0 + Socket.IO</span></div>
+            <div class="sysinfo-item"><span class="si-label">Face Detection</span><span class="si-val">MediaPipe FaceMesh 0.10</span></div>
+            <div class="sysinfo-item"><span class="si-label">Object Detection</span><span class="si-val">YOLOv8n (Ultralytics)</span></div>
+            <div class="sysinfo-item"><span class="si-label">Database</span><span class="si-val">SQLite 3 + SQLAlchemy</span></div>
+            <div class="sysinfo-item"><span class="si-label">Developer</span><span class="si-val">MCA Final Year Project 2024</span></div>
+        </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="settings-section danger-zone">
+        <h2 class="settings-group-title danger-title">
+            <i class="fa-solid fa-triangle-exclamation"></i> Danger Zone
+        </h2>
+        <div class="settings-card">
+            <div class="danger-row">
+                <div>
+                    <strong>Clear All Detection Logs</strong>
+                    <p>Permanently delete all detection logs and alert records from the database.</p>
+                </div>
+                <button class="btn btn-danger" onclick="confirmClearLogs()">
+                    <i class="fa-solid fa-trash"></i> Clear Logs
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}
