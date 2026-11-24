@@ -1,225 +1,206 @@
 # AI-Based Driver Drowsiness and Distraction Detection System
 
-> **MCA Final Year Project — 2024**  
-> Real-time driver monitoring using Computer Vision and Deep Learning
+> **MCA Final Year Project — 2026**
+
+Real-time driver monitoring using Computer Vision and Deep Learning.
 
 ---
 
 ## Overview
 
-DrowsyGuard is a real-time driver safety system that detects:
+**DrowsyGuard** is a real-time driver safety and monitoring system designed to detect driver drowsiness and distraction using computer vision and deep learning techniques.
 
-- **Eye closure** — Eye Aspect Ratio (EAR) via MediaPipe FaceMesh
-- **Yawning** — Mouth Aspect Ratio (MAR)
-- **Head pose** — Pitch/Yaw/Roll via OpenCV solvePnP
-- **Phone usage** — YOLOv8 object detection
-- **Distraction** — Fused multi-signal scoring
+The system detects the following driver behaviours:
 
-Alerts are delivered via audio (pygame) and text-to-speech (pyttsx3). All events are logged to SQLite and visualised on a Flask + Socket.IO web dashboard.
+- **Eye Closure Detection** – Uses Eye Aspect Ratio (EAR) through MediaPipe FaceMesh to identify prolonged eye closure.
+- **Yawning Detection** – Uses Mouth Aspect Ratio (MAR) to identify signs of drowsiness.
+- **Head Pose Estimation** – Estimates Pitch, Yaw and Roll angles using OpenCV solvePnP.
+- **Phone Usage Detection** – Uses YOLOv8 object detection to identify mobile phone usage.
+- **Distraction Detection** – Combines multiple detection signals to identify distracted driving.
+
+Alerts are delivered through audio notifications using pygame and text-to-speech using pyttsx3.
+
+All detection events are stored in an SQLite database and displayed through a Flask and Socket.IO web dashboard.
+
+## Key Features
+
+- Real-time driver face monitoring.
+- Eye closure and drowsiness detection.
+- Yawning detection.
+- Head pose estimation.
+- Mobile phone usage detection.
+- Sunglasses detection.
+- Multi-signal distraction detection.
+- Audio and voice-based alerts.
+- SQLite database for event logging.
+- Interactive web dashboard.
+- Detection history and reports.
+- Model training and evaluation scripts.
 
 ---
 
 ## Quick Start
 
-### 1. Clone / extract the project
+### 1. Clone the Repository
+
 ```bash
-cd Driver-Drowsiness-System
+git clone https://github.com/Sowbhs-code/AI-Driver-Drowsiness-Detection.git
+cd AI-Driver-Drowsiness-Detection
 ```
 
-### 2. Create a virtual environment
+### 2. Create a Virtual Environment
+
 ```bash
 python -m venv venv
-# Windows
+```
+
+**Windows:**
+
+```bash
 venv\Scripts\activate
-# macOS / Linux
+```
+
+**macOS / Linux:**
+
+```bash
 source venv/bin/activate
 ```
 
-### 3. Install dependencies
+### 3. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-> **Note:** `dlib` requires CMake. On Windows run `pip install cmake` first.  
-> For GPU support install the CUDA-enabled PyTorch wheel from https://pytorch.org
+**Note:**
 
-### 4. Initialise the database
+- Install CMake if required by the dlib dependency.
+- For GPU support, install the appropriate CUDA-enabled PyTorch version from https://pytorch.org.
+- Ensure that all required Python dependencies are installed before running the application.
+
+### 4. Initialise the Database
+
 ```bash
 python database/init_db.py
-# Add sample data for testing the UI:
+```
+
+To add sample data for testing the dashboard:
+
+```bash
 python database/init_db.py --sample
 ```
 
-### 5. Run the application
+### 5. Run the Application
+
 ```bash
 python app.py
 ```
 
-Open **http://127.0.0.1:5000** in your browser.
+Open the following URL in your browser:
+
+http://127.0.0.1:5000
 
 ---
 
 ## Project Structure
 
-```
-Driver-Drowsiness-System/
-├── app.py                      # Flask application entry point
-├── requirements.txt
-├── README.md
+```text
+AI-Driver-Drowsiness-Detection/
 │
-├── modules/                    # Detection modules
-│   ├── face_detector.py        # MediaPipe FaceMesh wrapper
-│   ├── eye_detector.py         # EAR-based eye closure detection
-│   ├── yawn_detector.py        # MAR-based yawn detection
-│   ├── head_pose.py            # solvePnP head pose estimation
-│   ├── phone_detector.py       # YOLOv8 phone detection
-│   ├── distraction_detector.py # Multi-signal fusion scorer
-│   └── alert_system.py         # Audio + TTS alert manager
+├── app.py
+├── README.md
+├── TRAINING_GUIDE.md
+├── requirements.txt
+├── req_app.txt
+│
+├── alerts/
+│   ├── alert_distracted.wav
+│   ├── alert_drowsy.wav
+│   ├── alert_phone.wav
+│   └── alert_yawn.wav
 │
 ├── database/
-│   ├── models.py               # SQLAlchemy ORM models
-│   ├── db_manager.py           # High-level data access layer
-│   ├── schema.sql              # Raw SQL schema + views
-│   └── init_db.py              # Standalone DB initialiser
+│   ├── __init__.py
+│   ├── db_manager.py
+│   ├── init_db.py
+│   ├── models.py
+│   └── schema.sql
 │
-├── templates/                  # Jinja2 HTML templates
+├── documentation/
+│   ├── ppt_content.md
+│   ├── project_report.md
+│   └── research_paper.md
+│
+├── models/
+│   ├── eye_cnn.keras
+│   ├── eye_cnn_v2.keras
+│   ├── sunglasses_cnn.keras
+│   ├── yawn_cnn.keras
+│   └── yawn_cnn_v2.keras
+│
+├── modules/
+│   ├── __init__.py
+│   ├── alert_system.py
+│   ├── cnn_models.py
+│   ├── distraction_detector.py
+│   ├── eye_detector.py
+│   ├── face_detector.py
+│   ├── head_pose.py
+│   ├── phone_detector.py
+│   ├── sunglasses_detector.py
+│   └── yawn_detector.py
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       ├── dashboard.js
+│       ├── logs.js
+│       ├── main.js
+│       ├── reports.js
+│       └── settings.js
+│
+├── templates/
 │   ├── base.html
-│   ├── index.html
 │   ├── dashboard.html
+│   ├── index.html
+│   ├── login.html
 │   ├── logs.html
+│   ├── register.html
 │   ├── reports.html
 │   └── settings.html
 │
-├── static/
-│   ├── css/style.css
-│   └── js/                     # dashboard.js, logs.js, reports.js …
-│
-├── training/
-│   ├── train_drowsiness_cnn.py # PyTorch CNN for eye state
-│   ├── train_yolo_phone.py     # YOLOv8 fine-tuning
-│   ├── evaluate_real.py        # REAL metrics on labelled images (EAR/MAR/sunglasses)
-│   ├── extract_frames.py       # video -> labelled frames for your own data
-│   └── dataset_info.md         # Dataset download links
-│
 ├── tests/
-│   ├── test_detectors.py
-│   ├── test_flask_app.py
+│   ├── __init__.py
+│   ├── conftest.py
 │   ├── test_alert_system.py
 │   ├── test_database.py
-│   └── conftest.py
+│   ├── test_detectors.py
+│   └── test_flask_app.py
 │
-├── yolov8_model/               # YOLOv8 weights (yolov8n.pt)
-├── alerts/                     # Alert audio files (.wav/.mp3)
-├── screenshots/                # Auto-captured alert screenshots
-├── dataset/                    # Training datasets
-├── reports/                    # Generated evaluation reports
-└── documentation/              # Research paper, project report, PPT
+├── training/
+│   ├── dataset_info.md
+│   ├── evaluate_real.py
+│   ├── extract_frames.py
+│   ├── train_drowsiness_cnn.py
+│   └── train_yolo_phone.py
+│
+├── yolov8_model/
+│   └── yolov8n.pt
+│
+├── train_eye.py
+├── train_sunglasses.py
+├── train_yawn.py
+└── train_yawn_v2.py
 ```
 
 ---
 
 ## Configuration
 
-Thresholds can be adjusted at runtime via the **Settings** page or by editing `app.py`:
+Detection thresholds can be adjusted through the Settings page or by editing the application configuration in `app.py`.
 
 | Parameter | Default | Description |
-|-----------|---------|-------------|
-| `EAR_THRESHOLD` | 0.25 | EAR below this → eyes closed |
-| `EAR_CONSEC_FRAMES` | 20 | Frames before drowsiness alert |
-| `MAR_THRESHOLD` | 0.60 | MAR above this → yawning |
-| `MAR_CONSEC_FRAMES` | 15 | Frames before yawn alert |
-| `HEAD_PITCH_THRESHOLD` | 20° | Vertical head tilt limit |
-| `HEAD_YAW_THRESHOLD` | 30° | Horizontal head turn limit |
-| `PHONE_CONF_THRESHOLD` | 0.50 | YOLOv8 minimum confidence |
-
----
-
-## Running Tests
-
-```bash
-# All tests
-pytest tests/ -v
-
-# Unit tests only
-pytest tests/ -v -m unit
-
-# With coverage report
-pip install pytest-cov
-pytest tests/ --cov=. --cov-report=html
-```
-
----
-
-## Model Training
-
-### Eye State CNN
-```bash
-# Download dataset first (see training/dataset_info.md)
-python training/train_drowsiness_cnn.py
-```
-
-### YOLOv8 Phone Detector
-```bash
-python training/train_yolo_phone.py
-```
-
-### Evaluate All Models
-```bash
-python training/evaluate_real.py
-# Reports saved to reports/
-```
-
----
-
-## Detection Accuracy
-
-**No accuracy figures are claimed until you measure them.** Run the evaluation scripts
-(see TRAINING_GUIDE.md) and paste the real numbers from `reports/` here.
-Always state which method each result belongs to: pretrained model, custom-trained model, or heuristic.
-
-| Module | Method type | Test images | Accuracy | Precision | Recall | F1 |
-|--------|-------------|-------------|----------|-----------|--------|----|
-| Eye state CNN | custom-trained | (fill) | (fill) | (fill) | (fill) | (fill) |
-| Eye closure (EAR) | heuristic | (fill) | (fill) | (fill) | (fill) | (fill) |
-| Yawn (MAR) | heuristic | (fill) | (fill) | (fill) | (fill) | (fill) |
-| Sunglasses | heuristic | (fill) | (fill) | (fill) | (fill) | (fill) |
-| Phone (YOLOv8n COCO) | pretrained | (fill) | mAP50 (fill) | | | |
-
----
-
-## Technology Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Backend | Python 3.10+, Flask 3.0, Flask-SocketIO |
-| Computer Vision | OpenCV 4.10, MediaPipe 0.10 |
-| Deep Learning | PyTorch 2.3, YOLOv8 (Ultralytics) |
-| Database | SQLite 3, SQLAlchemy 2.0 |
-| Frontend | HTML5, CSS3, JavaScript, Chart.js, Socket.IO |
-| Audio | pygame, pyttsx3 |
-| Testing | pytest, pytest-flask |
-
----
-
-## Dataset Links
-
-| Dataset | URL |
-|---------|-----|
-| MRL Eye Dataset | https://mrl.cs.vsb.cz/eyedataset |
-| Drowsiness Kaggle | https://www.kaggle.com/datasets/dheerajperumandla/drowsiness-dataset |
-| Roboflow Phone | https://universe.roboflow.com/roboflow-100/cell-phones-detection |
-| NTHU Drowsy Driver | http://cv.cs.nthu.edu.tw/php/callforpaper/datasets/DDD/ |
-
----
-
-## License
-
-This project is developed for academic purposes as an MCA Final Year Project.
-
----
-
-## Author
-
-**MCA Final Year Student — 2024**  
-Department of Computer Applications  
-*AI-Based Driver Drowsiness and Distraction Detection System*
+|---|---:|---|
+| EAR_THRESHOLD | 0.25 | EAR below this value indicates closed eyes |
+| EAR
